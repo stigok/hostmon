@@ -2,56 +2,52 @@ const Emitter = require('events')
 const { spawn } = require('child_process')
 const es = require('event-stream')
 
-// Default options
-const defaults = {
-  hostname: null
-}
-Object.freeze(defaults)
-
 const hostUpPattern = /\d+ bytes from .+ time=([\d.]+) ms/
-const noAnswerPattern = /no answer yet for icmp_seq=(\d+)/
+//const noAnswerPattern = /no answer yet for icmp_seq=(\d+)/
 
 // Main function
-function Pinger (options) {
-  const opts = Object.assign(options, {
-    foo: 'bar'
-  })
+class Pinger extends Emitter {
+  constructor (opts) {
+    super()
+    this.options = Object.assign({
+      host: null,
+      timeoutSec: 3
+    }, opts) 
+    this.start()
+  }
 
-  const emitter = new Emitter()
-  const args = ['-ndO', '-i 1', '-W 3', options.hostname]
-  const proc = spawn('ping', args)
-  proc.stdout.pipe(process.stdout)
-  proc.stderr.pipe(process.stderr)
+  start () {
+    // Spawn ping process
+    this._proc = spawn('ping', [
+      '-n', // no resolve hostname
+      '-D', // print timestamp
+      '-O', // report outstanding replies before send
+      `-i ${this.options.timeoutSec}`, // interval
+      '-W 3', // ping timeout
+      this.options.host
+    ])
 
-  emitter.kill = () => proc.kill()
+    // Handle process output
+    this._proc.stdout
+      .pipe(es.split())
+      .pipe(es.map((line, next) => {
+        const hostUp = hostUpPattern.exec(line)
 
-  proc.stdout
-    .pipe(es.split())
-    .pipe(es.map((line, next) => {
-      const hostUp = hostUpPattern.exec(line)
-      const noAnswer = noAnswerPattern.exec(line)
+        this.emit('data', {
+          host: this.options.host,
+          status: hostUp ? 'up' : 'timeout',
+          ping: hostUp ? Number(hostUp[1]) : -1,
+          timestamp: Date.now()
+        })
 
-      if (hostUp) {
-        emitter.emit('pong', { ms: Number(hostUp[1]) })
-      } else if (noAnswer) {
-        emitter.emit('timeout')
-      }
+        next()
+      }))
+  }
 
-      next()
-    }))
-
-  return emitter
+  stop () {
+    return this._proc.exit()
+  }
 }
 
 module.exports = Pinger
-
-if (!module.parent) {
-  const logger = require('./logger')('Pinger')
-
-  const pinger = Pinger({hostname: 'stigok.com'})
-    .on('pong', (res) => logger.info('Got answer in %d ms', res.ms))
-    .on('unreachable', (err) => logger.error(err))
-
-  process.on('SIGINT', () => pinger.kill())
-}
 
