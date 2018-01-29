@@ -1,7 +1,7 @@
 const Emitter = require('events')
 
 class Alarm extends Emitter {
-  constructor ({timeout}) {
+  constructor ({timeout, autostart=true}) {
     super()
 
     console.log('timeout', timeout)
@@ -10,6 +10,10 @@ class Alarm extends Emitter {
     }
 
     this._timeout = timeout
+
+    if (autostart) {
+      this.start()
+    }
   }
 
   stop () {
