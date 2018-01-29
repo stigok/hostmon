@@ -1,3 +1,15 @@
+/*
+Returns an EventEmitter that emits an 'alarm' event whenever it goes off.
+Instantiate an Alarm with a timeout amount in milliseconds.
+Invoking extend() will reset the alarm and make it count back down from timeout
+again.
+
+const alarm = new Alarm({timeout: 10000})
+setTimeout(() => alarm.extend(), 5000)
+alarm.on('alarm', () => console.log('~15 seconds have passed'))
+
+*/
+
 const Emitter = require('events')
 
 class Alarm extends Emitter {
