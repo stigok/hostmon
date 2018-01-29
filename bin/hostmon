@@ -1,7 +1,9 @@
+#!/usr/bin/env node
+
 const assert = require('assert')
-const Alarm = require('./alarm')
-const Logger = require('./logger')
-const Pinger = require('./pinger')
+const Alarm = require('../alarm')
+const Logger = require('../logger')
+const Pinger = require('../pinger')
 
 const timeout = 10000
 const host = process.argv[2]
@@ -17,8 +19,9 @@ logger.info('Will report dead if not responding within %dms', timeout)
 pinger.on('data', (res) => {
   if (res.status === 'up') {
     alarm.extend()
+    logger.debug('Response received', res)
   } else {
-    logger.info('Missed last reply')
+    logger.info('No response from host', res)
   }
 })
 
