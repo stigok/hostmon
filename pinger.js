@@ -36,7 +36,7 @@ class Pinger extends Emitter {
         this.emit('data', {
           host: this.options.host,
           status: hostUp ? 'up' : 'timeout',
-          ping: hostUp ? Number(hostUp[1]) : -1,
+          ping: hostUp ? Number(hostUp[1]) : null,
           timestamp: Date.now()
         })
 
