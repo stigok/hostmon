@@ -42,9 +42,15 @@ class Pinger extends Emitter {
 
         next()
       }))
+
+    // Restart when process fai;s
+    this._proc.once('close', () => {
+      this.start()
+    })
   }
 
   stop () {
+    this._proc.removeAllListeners('close')
     return this._proc.exit()
   }
 }
