@@ -16,7 +16,6 @@ class Alarm extends Emitter {
   constructor ({timeout, autostart=true}) {
     super()
 
-    console.log('timeout', timeout)
     if (!timeout || typeof timeout !== 'number') {
       throw new Error('Must specify a timeout')
     }
