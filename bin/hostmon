@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
 const assert = require('assert')
-const Alarm = require('../alarm')
-const Logger = require('../logger')
-const Pinger = require('../pinger')
+const { Pinger, Alarm, Logger } = require('../')
 
 const timeout = 10000
 const host = process.argv[2]
