@@ -1,6 +1,6 @@
 {
   "name": "hostmon",
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.1-alpha.3",
   "description": "",
   "bin": "bin/hostmon",
   "main": "index.js",
