@@ -22,9 +22,10 @@ class Pinger extends Emitter {
   start () {
     // Spawn ping process
     this._proc = spawn('ping', [
-      '-n', // no resolve hostname
-      `-i ${this.options.timeoutSec}`, // interval
-      '-W 3', // ping timeout
+      `-n`, // no resolve hostname
+      `-c 3`, // kill process after 3 ICMP's
+      `-W ${this.options.timeoutSec}`,
+      `-i ${this.options.timeoutSec + 1}`, // packet sending interval
       this.options.host
     ])
 
