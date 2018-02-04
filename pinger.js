@@ -20,8 +20,6 @@ class Pinger extends Emitter {
     // Spawn ping process
     this._proc = spawn('ping', [
       '-n', // no resolve hostname
-      '-D', // print timestamp
-      '-O', // report outstanding replies before send
       `-i ${this.options.timeoutSec}`, // interval
       '-W 3', // ping timeout
       this.options.host
