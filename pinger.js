@@ -20,14 +20,20 @@ class Pinger extends Emitter {
   }
 
   start () {
-    // Spawn ping process
-    this._proc = spawn('ping', [
+    const defaultPingArgs = [
       `-n`, // no resolve hostname
       `-c 3`, // kill process after 3 ICMP's
       `-W ${this.options.timeoutSec}`,
-      `-i ${this.options.timeoutSec + 1}`, // packet sending interval
-      this.options.host
-    ])
+      `-i ${this.options.timeoutSec + 1}` // packet sending interval
+    ]
+    const pingArgs = process.env.PING_ARGS && process.env.PING_ARGS.length
+      ? process.env.PING_ARGS.split(' ')
+      : defaultPingArgs
+
+    pingArgs.push(this.options.host)
+
+    // Spawn ping process
+    this._proc = spawn('ping', pingArgs)
 
     // Handle process output
     this._proc.stdout
