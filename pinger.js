@@ -1,7 +1,9 @@
 const Emitter = require('events')
 const { spawn } = require('child_process')
 const es = require('event-stream')
+const Logger = require('./logger')
 
+const log = new Logger('Pinger')
 const hostUpPattern = /\d+ bytes from .+ time=([\d.]+) ms/
 //const noAnswerPattern = /no answer yet for icmp_seq=(\d+)/
 
@@ -13,6 +15,7 @@ class Pinger extends Emitter {
       host: null,
       timeoutSec: 3
     }, opts) 
+    log.debug('options', this.options)
     this.start()
   }
 
@@ -38,17 +41,29 @@ class Pinger extends Emitter {
           timestamp: Date.now()
         })
 
+        log.debug('stdout', line)
         next()
       }))
 
-    // Restart when process fai;s
+    this._proc.stderr
+      .pipe(es.split())
+      .pipe(es.map((line, next) => {
+        log.debug('stderr', line)
+        next()
+      }))
+
+    this._proc.on('error', (err) => {
+      log.debug('error', err)
+    })
+
+    // Restart when process fails
     this._proc.once('close', () => {
       this.start()
     })
   }
 
   stop () {
-    this._proc.removeAllListeners('close')
+    this._proc.removeAllListeners()
     return this._proc.exit()
   }
 }
