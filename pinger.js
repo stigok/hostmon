@@ -14,7 +14,7 @@ class Pinger extends Emitter {
     this.options = Object.assign({
       host: null,
       timeoutSec: 3
-    }, opts) 
+    }, opts)
     log.debug('options', this.options)
     this.start()
   }
