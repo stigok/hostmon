@@ -43,6 +43,7 @@ class Alarm extends Emitter {
   extend () {
     if (this._emitResetOnNextExtend) {
       this.emit('reset')
+      this._emitResetOnNextExtend = false
     }
 
     this.emit('extend', this._timeout)
