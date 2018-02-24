@@ -24,6 +24,8 @@ class Alarm extends Emitter {
     }
 
     this._timeout = timeout
+    this._alarmTimer = null
+    this._emitResetOnNextExtend = false
 
     if (autostart) {
       this.start()
