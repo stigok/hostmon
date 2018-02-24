@@ -4,9 +4,12 @@ Instantiate an Alarm with a timeout amount in milliseconds.
 Invoking extend() will reset the alarm and make it count back down from timeout
 again.
 
+Example usage:
+
 const alarm = new Alarm({timeout: 10000})
 setTimeout(() => alarm.extend(), 5000)
 alarm.on('alarm', () => console.log('~15 seconds have passed'))
+alarm.on('reset', () => console.log('The alarm was extended after an alarm event'))
 
 */
 
@@ -29,6 +32,7 @@ class Alarm extends Emitter {
 
   stop () {
     clearTimeout(this._alarmTimer)
+    this._emitResetOnNextExtend = false
   }
 
   start () {
@@ -37,13 +41,19 @@ class Alarm extends Emitter {
   }
 
   extend () {
+    if (this._emitResetOnNextExtend) {
+      this.emit('reset')
+    }
+
     this.emit('extend', this._timeout)
 
     clearTimeout(this._alarmTimer)
+    this._alarmTimer = setTimeout(() => this._onAlarm(), this._timeout)
+  }
 
-    this._alarmTimer = setTimeout(() => {
-      this.emit('alarm')
-    }, this._timeout)
+  _onAlarm () {
+    this.emit('alarm')
+    this._emitResetOnNextExtend = true
   }
 }
 
