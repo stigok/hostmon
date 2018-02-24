@@ -24,4 +24,5 @@ pinger.on('data', (res) => {
 })
 
 alarm.on('alarm', () => logger.error('Host did not respond within time limit'))
+alarm.on('reset', () => logger.info('Alarm was reset'))
 
