@@ -16,4 +16,12 @@ $ docker run --network host
 ## Docker
 ### Build image
 
+```
+$ docker build -t hostmon .
+```
 
+### Test it out with a host
+
+```
+# docker run hostmon bin/hostmon stigok.com
+```
